@@ -5,109 +5,10 @@ import { View, Image, ScrollView } from 'react-native';
 import { HorizontalCalendar } from "@/app/components/horizontalCalendar";
 import { ModalContainer } from "@/app/components/modalContainer"
 
-import { styles } from "../stylesheet"
+import { styles } from "@/app/stylesheet"
 import { default as colorTheme } from '@/custom-theme.json';
 
-/**
- * 
- */
-
-// you might need to define some dummy data for other screens too. dont think it will be this complex on other pages tho
-const MED_DATA = {
-  Mon: [
-    {
-      hour: "9:00AM",
-      data: [
-          {
-          time: "9:00AM",
-          name: "Medication Name",
-          taken: true,
-          timeTaken: "9:12AM",
-          id: 1
-        },
-        {
-          time: "9:30AM",
-          name: "Medication Name",
-          taken: false,
-          timeTaken: null,
-          id: 2
-        }
-      ]
-    },
-    {
-      hour: "12:00PM",
-      data: [
-        {
-          time: "12:00PM",
-          name: "Medication Name",
-          taken: false,
-          timeTaken: null,
-          id: 3
-        },
-        {
-          time: "12:10PM",
-          name: "Medication Name",
-          taken: false,
-          timeTaken: null,
-          id: 4
-        }
-      ]
-    }
-  ],
-  Tue: [
-    {
-      hour: "9:00AM",
-      data: [
-          {
-          time: "9:00AM",
-          name: "Tuesday Medication",
-          taken: true,
-          timeTaken: "9:12AM",
-          id: 1
-        },
-      ]
-    },
-    {
-      hour: "12:00PM",
-      data: [
-        {
-          time: "12:00PM",
-          name: "Medication Name",
-          taken: false,
-          timeTaken: null,
-          id: 3
-        },
-        {
-          time: "12:10PM",
-          name: "Medication Name",
-          taken: false,
-          timeTaken: null,
-          id: 4
-        }
-      ]
-    }
-  ],
-  Wed: {
-    hour: "",
-    data: []
-  },
-  Thu: {
-    hour: "",
-    data: []
-  },
-  Fri: {
-    hour: "",
-    data: []
-  },
-  Sat: {
-    hour: "",
-    data: []
-  },
-  Sun: {
-    hour: "",
-    data: []
-  }
-};
+import { MED_DATA } from "@/app/data/medData"
 
 // ---------------------------------------------------- COMPONENTS ----------------------------------------------------
 /**
@@ -117,44 +18,32 @@ const MED_DATA = {
  */
 const MedCard = (props) => {
   const data = props.data;
-  if (!data.taken) {  // just checks if it's taken and will return something different whether it is or isn't. honestly i just copy pasted and changed 1 line so it's kind of clunky rn. this sucks actually
-    return(
-      <View style={{...styles.rowContainer, backgroundColor: colorTheme['light-blue'], padding: "1rem", borderRadius: "2rem", justifyContent: "center", marginVertical: ".5rem"}}>
-        <View style={{flex: 3, alignItems: "center"}}>
-          <Image
-            style={{maxHeight: "4rem", maxWidth: "4rem"}}
-            source={require("@/assets/icons/button.svg")}
-          />
-        </View>
-        <View style={{flex: 7}}>
-          <Text category='p1'>{data.time}</Text>
-          <Text category='h2'>{data.name}</Text>
-          <View style={{alignItems: "flex-end"}}>
-            <Button size='small' style={{...styles.orangeButton, borderRadius: "4rem", marginTop: ".5rem"}} children={() => <Text style={{margin:"none", paddingHorizontal: ".5rem"}} category='p2'>Mark as Taken</Text>}/>
-          </View>
-        </View>
-      </View>  
-    )
-  }
-  else {
-    return(
-      <View style={{...styles.rowContainer, backgroundColor: colorTheme['light-blue'], padding: "1rem", borderRadius: "2rem", justifyContent: "center", marginVertical: ".5rem"}}>
-        <View style={{flex: 3, alignItems: "center"}}>
-          <Image
-            style={{maxHeight: "4rem", maxWidth: "4rem"}}
-            source={require("@/assets/icons/button.svg")}
-          />
-        </View>
-        <View style={{flex: 7}}>
-          <Text category='p1'>{data.time}</Text>
-          <Text category='h2'>{data.name}</Text>
-          <View style={{alignItems: "flex-end"}}>
+  return(
+    <View style={
+      !data.taken ?
+        {...styles.rowContainer, padding: "1rem", borderRadius: "2rem", justifyContent: "center", marginVertical: ".5rem", backgroundColor: colorTheme['light-blue']}
+        :
+        {...styles.rowContainer, padding: "1rem", borderRadius: "2rem", justifyContent: "center", marginVertical: ".5rem", backgroundColor: colorTheme['light-blue-80']}
+      }>
+      <View style={{flex: 3, alignItems: "center"}}>
+        <Image
+          source={data.icon}
+        />
+      </View>
+      <View style={{flex: 7}}>
+        <Text category='p1'>{data.time}</Text>
+        <Text category='h2'>{data.name}</Text>
+        <View style={{alignItems: "flex-end"}}>
+          {
+            data.taken ?
             <Text category='p1'>Taken at {data.timeTaken}</Text>
-          </View>
+            :
+            <Button size='small' onPress={() => props.handleTaken(data.id)} style={{...styles.orangeButton, borderRadius: "4rem", marginTop: ".5rem"}} children={() => <Text style={{margin:"none", paddingHorizontal: ".5rem"}} category='p2'>Mark as Taken</Text>}/>
+          }
         </View>
       </View>
-    )
-  }
+    </View>  
+  )
 }
 
 /**
@@ -166,12 +55,12 @@ const MedCard = (props) => {
  * sections (SectionList) or data (FlatList) is required too, as its the data it requires to build the list. specific format is needed check the docs
  * theres a FlatList example in components/horizontalCalendar.js
  */
-const MedList = ({dayData}) => {
+const MedList = ({dayData, handleTaken}) => {
   return(
     <ScrollView style={{ width: "100%"}}> 
       <SectionList
         sections={dayData}
-        renderItem={({item}) => <MedCard dayData={dayData} data={item}/>}
+        renderItem={({item}) => <MedCard handleTaken={handleTaken} data={item}/>}
         keyExtractor={ item => item.id}
         renderSectionHeader={({section: {hour}}) => (
           <Text category='p2'>{hour}</Text>
@@ -198,11 +87,15 @@ const Important = (props) => (
 )
 // ---------------------------------------------------- COMPONENTS ----------------------------------------------------
 
+function getTime() {
+  const time = new Date().toLocaleTimeString();
+  return time.slice(0, -8).concat(" ".concat(time.slice(-4).toUpperCase()));
+}
 
 /**
  * main page component
  */
-export const HomeScreen = ({ }) => {
+export const HomeScreen = ({navigation}) => {
 
   // determines whether or not the modal is visible. if you need to implement a modal just copy this and the modal below (not including ModalContainer) and it should work
   const [overlayVisible, setOverlayVisible] = useState(false); 
@@ -230,9 +123,20 @@ export const HomeScreen = ({ }) => {
     }
   }
 
+  const handleTaken = (id) => {
+    setDayData((previous) => 
+      previous.map((category) => ({
+        ...category,
+        data: category.data.map((med) => 
+          med.id === id ? {...med, taken: true, timeTaken: getTime() } : med
+        )
+      }))
+    )
+  }
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <Layout style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: "2.5rem", backgroundColor: colorTheme['silver-white']}}>
+      <Layout style={styles.masterLayout}>
 
         {/* modal component from UI kitten. it's a popup/overlay thing */}
         <Modal
@@ -270,7 +174,7 @@ export const HomeScreen = ({ }) => {
               <Important toggleOverlayVisible={toggleOverlayVisible} />
 
               {/* custom component for the list of medications created above */}
-              <MedList dayData={dayData}/>
+              <MedList dayData={dayData} handleTaken={handleTaken}/>
             </>
           :
           // else (no data), render this
