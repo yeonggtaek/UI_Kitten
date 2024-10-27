@@ -580,15 +580,6 @@ export const EditReminderScreen = ({ navigation }) => {
           <View style={{ gap: 20, margin: 20 }}>
             <View>
               <Text category="p2">Time</Text>
-              <Select
-                selectedIndex={selectedIndex}
-                onSelect={(index) => setSelectedIndex(index)}
-                value={strengthOptions[selectedIndex - 1]}
-              >
-                {strengthOptions.map((i, index) => (
-                  <SelectItem key={index} title={i} />
-                ))}
-              </Select>
             </View>
             <View>
               <Text category="p2">Time Interval</Text>
