@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { SafeAreaView, SectionList, TouchableOpacity } from "react-native";
 import {
   Button,
@@ -7,6 +7,7 @@ import {
   Text,
   Modal,
   ModalService,
+  Input
 } from "@ui-kitten/components";
 import { View, Image, ScrollView } from "react-native";
 import { HorizontalCalendar } from "@/app/components/horizontalCalendar";
@@ -17,6 +18,7 @@ import { styles } from "@/app/stylesheet";
 import { default as colorTheme } from "@/custom-theme.json";
 
 import { MED_DATA } from "@/app/data/medData";
+
 
 // ---------------------------------------------------- COMPONENTS ----------------------------------------------------
 /**
@@ -37,11 +39,12 @@ const MedCard = (props) => {
     <View
       style={{ flexDirection: "row", gap: "1rem", justifyContent: "center" }}
     >
-      <Button size="giant">Skip</Button>
-      <Button size="giant" onPress={() => setReschedule(true)}>
+      <Button style={{flex: 3}} size="giant">Skip</Button>
+      <Button style={{flex: 7}} size="giant" onPress={() => setReschedule(true)}>
         Reschedule
       </Button>
       <Button
+        style={{flex: 4}}
         size="giant"
         onPress={() => {
           props.handleTaken(data.id);
@@ -58,6 +61,7 @@ const MedCard = (props) => {
   // )
 
   const data = props.data;
+
   return (
     <>
       <Modal
@@ -99,7 +103,7 @@ const MedCard = (props) => {
                   padding: "1rem",
                   borderRadius: "2rem",
                   justifyContent: "center",
-                  marginVertical: ".5rem",
+                  marginVertical: "1.5rem",
                   backgroundColor: colorTheme["light-blue"],
                 }
               : {
@@ -107,7 +111,7 @@ const MedCard = (props) => {
                   padding: "1rem",
                   borderRadius: "2rem",
                   justifyContent: "center",
-                  marginVertical: ".5rem",
+                  marginVertical: "1.5rem",
                   backgroundColor: colorTheme["light-blue-80"],
                 }
           }
@@ -129,6 +133,7 @@ const MedCard = (props) => {
                     ...styles.orangeButton,
                     borderRadius: "4rem",
                     marginTop: ".5rem",
+                    position: "absolute"
                   }}
                   children={() => (
                     <Text
@@ -159,18 +164,20 @@ const MedCard = (props) => {
  */
 const MedList = ({ dayData, handleTaken }) => {
   return (
-    <ScrollView style={{ width: "100%" }}>
-      <SectionList
-        sections={dayData}
-        renderItem={({ item }) => (
-          <MedCard handleTaken={handleTaken} data={item} />
-        )}
-        keyExtractor={(item) => item.id}
-        renderSectionHeader={({ section: { hour } }) => (
-          <Text category="p2">{hour}</Text>
-        )}
-      />
-    </ScrollView>
+    <SectionList style={{ flex: 1, width: '100%' }}
+      sections={dayData}
+      renderItem={({ item }) => (
+        <MedCard handleTaken={handleTaken} data={item} />
+      )}
+      keyExtractor={(item) => item.id}
+      renderSectionHeader={({ section: { hour } }) => (
+        <Text category="p2">{hour}</Text>
+      )}
+      // Optional: Add a header or footer if needed
+      ListHeaderComponent={<Text style={{ fontSize: 20, fontWeight: 'bold' }}>My Medications</Text>}
+      ListFooterComponent={<View style={{ height: 20 }} />} // Example footer; adjust as necessary
+      contentContainerStyle={{ padding: 10 }} // Add padding to the content
+    />
   );
 };
 
@@ -182,7 +189,7 @@ const Important = (props) => (
     onPress={props.toggleOverlayVisible}
     style={{ ...styles.orangeButton, width: "100%", marginVertical: ".5rem" }}
     children={() => (
-      <View style={{ ...styles.overlay }}>
+      <View style={{}}>
         <Text category="p2">1 serious drug interaction</Text>
       </View>
     )}
@@ -198,7 +205,15 @@ function getTime() {
 /**
  * main page component
  */
-export const HomeScreen = ({ navigation }) => {
+export const HomeScreen = ({ route, navigation }) => {
+  const [addedMedModalVisible, setAddedMedModalVisible] = useState(route.params.justAdded);
+  const [onboarding, setOnboarding] = useState(route.params.onboarding);
+
+  useEffect(() => {
+    console.log(onboarding);
+    if (onboarding) navigation.navigate("Med Stack", {screen: "Onboarding"});
+  },[])
+
   // determines whether or not the modal is visible. if you need to implement a modal just copy this and the modal below (not including ModalContainer) and it should work
   const [overlayVisible, setOverlayVisible] = useState(false);
   const toggleOverlayVisible = () => {
@@ -236,7 +251,35 @@ export const HomeScreen = ({ navigation }) => {
     );
   };
 
-  return (
+   return (
+    <> 
+    <Modal
+      visible={addedMedModalVisible}
+      backdropStyle={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
+      onBackdropPress={() => setAddedMedModalVisible(false)}
+    >
+      <View
+        style={{
+          backgroundColor: "#ffffff",
+          justifyContent: "center",
+          padding: "2.5rem",
+          paddingTop: "3rem",
+          width: "100vw",
+          position: "fixed",
+          bottom: "0",
+          left: "0",
+          borderTopLeftRadius: "5rem",
+          borderTopRightRadius: "5rem",
+        }}
+      >
+        <Text
+          style={{ marginBottom: "2rem", paddingHorizontal: "2rem" }}
+          category="h2"
+        >
+          {route.params.medication}
+        </Text>
+      </View>
+    </Modal>
     <SafeAreaView style={{ flex: 1 }}>
       <Layout style={styles.masterLayout}>
         {/* modal component from UI kitten. it's a popup/overlay thing */}
@@ -247,7 +290,17 @@ export const HomeScreen = ({ navigation }) => {
         >
           <ModalContainer // custom component in components/modalContainer.js the white box itself
             title="1 serious drug interaction"
-            body="THERE IS SOMETHING WRONG!!!"
+            body={
+              <>
+              <View style={{alignItems: "center", marginVertical: "2rem"}}>
+                <Text category="p2">Medication 1</Text>
+                <Text category="p2">Medication 2</Text>
+                <Text style={{marginVertical: "1rem"}} category="p1">has a drug interaction with</Text>
+                <Text category="p2">Medication 3</Text>
+                <Text style={{marginVertical: "1rem"}} category="p1">Consult your doctor or pharmacist.</Text>
+              </View>
+              </>
+            }
             toggleOverlayVisible={toggleOverlayVisible}
           />
         </Modal>
@@ -317,5 +370,276 @@ export const HomeScreen = ({ navigation }) => {
         }
       </Layout>
     </SafeAreaView>
+    </>
+  );
+};
+
+// onboarding
+export const Onboarding = ({ navigation }) => {
+  const [currentPage, setCurrentPage] = useState(0);
+  const [userName, setUserName] = useState('');
+  const onNameSubmit = (name) => setUserName(name); 
+
+  const onboardingPages = [
+    // Logo Page
+    {
+      id: 0,
+      render: () => {
+
+        return (
+          <Layout style={{
+            flex: 1,
+            width: '100%',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingVertical: '2.5rem',
+          }}>
+            <View style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}>
+              <Image
+                source={require("@/assets/graphics/Logo.svg")}
+                style={{
+                  width: '300px',
+                  marginBottom: '1.25rem'
+                }}
+                resizeMode="contain"
+              />
+              <Text category="h1" style={{
+                fontSize: '2rem',
+                fontWeight: 'bold',
+                color: colorTheme['light-green']
+              }}>
+              </Text>
+              <Text category="p" style={{
+                fontSize: '0.5rem',
+                fontWeight: 'bold',
+                color: colorTheme['light-green']
+              }}>
+                from Asclepius
+              </Text>
+            </View>
+            <Button
+            size="giant"
+            onPress={() => setCurrentPage(1)}
+            style={{
+              width: '100%',
+              borderRadius: '1rem',
+              marginTop: '1.25rem',
+              backgroundColor: colorTheme['light-green'],
+              borderColor: colorTheme['light-green'],
+            }}
+            >
+            {() => <Text category="h2">Next</Text>}
+            </Button>
+          </Layout>
+        );
+      },
+    },
+    // App Intro Page
+    {
+      id: 1,
+      render: () => (
+        <Layout style={{
+          flex: 1,
+          width: '100%',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          paddingVertical: '2.5rem',
+        }}>
+          <View style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingHorizontal: '1.25rem'
+          }}>
+            <Image
+              source={require("@/assets/graphics/onboarding1.svg")}
+              style={{
+                width: '300px',
+                marginBottom: '1.25rem'
+              }}
+              resizeMode="contain"
+            />
+            <Text category="h1" style={{
+              fontSize: '1.75rem',
+              marginBottom: '0.9375rem',
+              textAlign: 'center',
+              color: '#00A39B'
+            }}>
+              Welcome to Remedify
+            </Text>
+            <Text category="p1" style={{
+              fontSize: '1rem',
+              textAlign: 'center',
+              color: '#666',
+              paddingHorizontal: '1.25rem'
+            }}>
+              Easily manage your medications with 
+              reminders, refill alerts, and support from 
+              family or caregivers.
+            </Text>
+          </View>
+          <Button
+            size="giant"
+            onPress={() => setCurrentPage(2)}
+            style={{
+              width: '100%',
+              borderRadius: '1rem',
+              marginTop: '1.25rem',
+              backgroundColor: colorTheme['light-green'],
+              borderColor: colorTheme['light-green'],
+            }}
+          >
+            {() => <Text category="h2">Next</Text>}
+          </Button>
+        </Layout>
+      ),
+    },
+    // Name Input Page
+    {
+      id: 2,
+      render: () => (
+        <Layout style={{
+          flex: 1,
+          width: '100%',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          paddingVertical: '2.5rem',
+        }}>
+          <View style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%',
+            paddingHorizontal: '1.25rem'
+          }}>
+            <Image
+              source={require("@/assets/graphics/onboarding2.svg")}
+              style={{
+                width: '250px',
+                marginBottom: '1.25rem'
+              }}
+              resizeMode="contain"
+            />
+            <Text category="h1" style={{
+              fontSize: '1rem',
+              marginBottom: '1.875rem',
+              textAlign: 'center',
+              color: '#00A39B'
+            }}>
+              Introduce yourself!
+            </Text>
+            <Input
+              placeholder="Enter your name"
+              value={userName}
+              onChangeText={setUserName}
+              size="large"
+              style={{
+                width: '100%',
+                marginBottom: '0.9375rem',
+                borderRadius: '20px',
+                borderColor: colorTheme['light-green'],
+                borderWidth: '3px',
+              }}
+            />
+          </View>
+          <Button
+            size="giant"
+            onPress={() => setCurrentPage(3)}
+            style={{
+              width: '100%',
+              borderRadius: '1rem',
+              marginTop: '1.25rem',
+              backgroundColor: colorTheme['light-green'],
+              borderColor: colorTheme['light-green'],
+            }}
+            disabled={!userName.trim()}
+          >
+            {() => <Text category="h2">Confirm</Text>}
+          </Button>
+        </Layout>
+      ),
+    },
+    // Get Started Page
+    {
+      id: 3,
+      render: () => (
+        <Layout style={{
+          flex: 1,
+          width: '100%',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          paddingVertical: '2.5rem',
+        }}>
+          <View style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingHorizontal: '1.25rem'
+          }}>
+            <Image
+              source={require("@/assets/graphics/onboarding3.svg")}
+              style={{
+                width: '250px',
+                marginBottom: '1.25rem'
+              }}
+              resizeMode="contain"
+            />
+            <Text category="h1" style={{
+              fontSize: '1rem',
+              marginBottom: '0.9375rem',
+              textAlign: 'center',
+              color: '#00A39B'
+            }}>
+              Welcome, {userName}!{'\n'}
+              Your health, our priority
+            </Text>
+            <Text category="p1" style={{
+              fontSize: '1rem',
+              textAlign: 'center',
+              color: '#666',
+              paddingHorizontal: '1.25rem'
+            }}>
+              Stay on track with personalized medication 
+              support and timely reminders.
+            </Text>
+          </View>
+          <Button
+            size="giant"
+            onPress={() => {
+              onNameSubmit(userName);
+              navigation.navigate("Home Stack", {screen: "Home"});
+              // onComplete();
+            }}
+            style={{
+              width: '100%',
+              borderRadius: '1rem',
+              marginTop: '1.25rem',
+              backgroundColor: colorTheme['light-green'],
+              borderColor: colorTheme['light-green'],
+            }}
+          >
+            {() => <Text category="h2">Get Started</Text>}
+          </Button>
+        </Layout>
+      ),
+    },
+  ];
+
+  return (
+    <SafeAreaView style={{flex: 1}}>
+      <Layout style={{
+        flex: 1,
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '1.25rem',
+      }}>
+        {onboardingPages[currentPage].render()}
+      </Layout>
+    </SafeAreaView>
+    
   );
 };

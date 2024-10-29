@@ -9,6 +9,8 @@ import {
   Select,
   SelectItem,
   Modal,
+  Input,
+  Datepicker,
 } from "@ui-kitten/components";
 import { Header } from "@/app/components/header";
 import { MyButton } from "@/app/components/MyButton";
@@ -17,7 +19,7 @@ import { default as colorTheme } from "@/custom-theme.json";
 import { styles } from "@/app/stylesheet";
 
 import { LIBRARY_DATA } from "@/app/data/medData";
-import { TimeInterval } from "../components/timeInterval";
+import { HomeScreen } from "./home.component";
 
 const MedButton = ({ index, med, onPress, handleArchive, handleDelete }) => {
   const [showArchiveBottomModal, setShowArchiveBottomModal] = useState(false);
@@ -39,7 +41,7 @@ const MedButton = ({ index, med, onPress, handleArchive, handleDelete }) => {
       >
         <View
           style={{
-            backgroundColor: "#ffffff",
+            backgroundColor: "white",
             justifyContent: "center",
             padding: "2.5rem",
             paddingTop: "3rem",
@@ -76,7 +78,7 @@ const MedButton = ({ index, med, onPress, handleArchive, handleDelete }) => {
       >
         <View
           style={{
-            backgroundColor: "#ffffff",
+            backgroundColor: "white",
             justifyContent: "center",
             padding: "2.5rem",
             paddingTop: "3rem",
@@ -106,7 +108,7 @@ const MedButton = ({ index, med, onPress, handleArchive, handleDelete }) => {
               onPress={() => setShowArchiveModal(false)}
               style={{
                 flex: 1,
-                backgroundColor: colorTheme["silver-white"],
+                backgroundColor: colorTheme["white"],
                 borderColor: colorTheme["light-green"],
                 borderRadius: "1rem",
               }}
@@ -115,7 +117,7 @@ const MedButton = ({ index, med, onPress, handleArchive, handleDelete }) => {
             <Button
               size="small"
               onPress={() => {
-                // archive 로직
+                // archive logic
                 med.isArchive ? handleDelete(med) : handleArchive(med);
                 setShowArchiveModal(false);
                 setShowArchiveBottomModal(false);
@@ -551,7 +553,7 @@ export const InfoScreen = ({ navigation, route }) => {
   );
 };
 
-export const EditReminderScreen = ({ navigation }) => {
+export const EditReminderScreen = ({ route, navigation }) => {
   // edit reminder screen
   const [selectedIndex, setSelectedIndex] = useState(new IndexPath(0));
   const strengthOptions = ["2.5mg", "5mg", "10mg", "20mg", "30mg", "40mg"];
@@ -565,6 +567,7 @@ export const EditReminderScreen = ({ navigation }) => {
     "Cream",
   ];
   const refillsOptions = ["1", "2", "3", "4"];
+  const [date, setDate] = React.useState(new Date());
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -572,7 +575,6 @@ export const EditReminderScreen = ({ navigation }) => {
       <Layout style={styles.masterLayout}>
         <View style={{ flex: 1, justifyContent: "flex-start", width: "95%" }}>
           <Icon style={{ width: "40px" }} name="clock"></Icon>
-          <Text>Edit Reminder Info</Text>
           <Text>
             Lisinoprill
             {/* {medication.name} */}
@@ -580,22 +582,41 @@ export const EditReminderScreen = ({ navigation }) => {
           <View style={{ gap: 20, margin: 20 }}>
             <View>
               <Text category="p2">Time</Text>
+              <View style={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row', backgroundColor: "white", width: '90%', borderRadius: 20 }}>
+          <Input style={{ flex: 6}} placeholder='10: 30pm'/>
+              </View>
             </View>
             <View>
               <Text category="p2">Time Interval</Text>
+              <View style={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row', backgroundColor: "sliver-white", width: '90%', borderRadius: 20 }}>
+          <Input style={{ flex: 6}} placeholder='Every 2 hours'/>
+          <Button style={{ flex: 3 }} onPress={() => navigation.navigate("TimeIntervaledit")}>Edit</Button>
+        </View>
             </View>
             <View>
               <Text category="p2">Treatment Start Date</Text>
             </View>
+            <Datepicker
+        date={date}
+        onSelect={nextDate => setDate(nextDate)}
+      />
             <View>
               <Text category="p2">Treatment End Date</Text>
             </View>
+            <Datepicker
+        date={date}
+        onSelect={nextDate => setDate(nextDate)}
+      />
             <View>
               <Text category="p2">Refill Reminder</Text>
             </View>
+            <View style={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row', backgroundColor: "sliver-white", width: '90%', borderRadius: 20 }}>
+          <Input style={{ flex: 6}} placeholder='10 pill(s) left'/>
+          <Button style={{ flex: 3 }} onPress={() => navigation.navigate("Current Pill Number")}>Edit</Button>
           </View>
           <View style={{ gap: 6 }}>
             <Button
+              onPress={() => navigation.navigate("Info")}
               size="giant"
               style={{ ...styles.orangerButton, borderRadius: "1rem" }}
               children={() => <Text category="h2">Confirm</Text>}
@@ -610,6 +631,7 @@ export const EditReminderScreen = ({ navigation }) => {
               children={() => <Text category="h2">Scan Med Again</Text>}
             />
           </View>
+        </View>
         </View>
       </Layout>
     </SafeAreaView>
@@ -651,7 +673,7 @@ export const EditInfoScreen = ({ navigation, route }) => {
           </Text>
           <View style={{ gap: 20, margin: 20 }}>
             <View>
-              <Text category="p2">Direnctions for Use</Text>
+              <Text category="p2">Directions for Use</Text>
               <textarea
                 name="directions"
                 style={{
@@ -716,6 +738,7 @@ export const EditInfoScreen = ({ navigation, route }) => {
           </View>
           <View style={{ gap: 6 }}>
             <Button
+              onPress={() => navigation.navigate(InfoScreen)}
               size="giant"
               style={{ ...styles.orangerButton, borderRadius: "1rem" }}
               children={() => <Text category="h2">Confirm</Text>}
