@@ -43,18 +43,18 @@ const MedButton = ({ index, med, onPress, handleArchive, handleDelete }) => {
           style={{
             backgroundColor: "white",
             justifyContent: "center",
-            padding: "2.5rem",
-            paddingTop: "3rem",
-            width: "100vw",
+            padding: "40px",
+            paddingTop: "48px",
+            width: "100%",
             position: "fixed",
             bottom: "0",
             left: "0",
-            borderTopLeftRadius: "5rem",
-            borderTopRightRadius: "5rem",
+            borderTopLeftRadius: "80px",
+            borderTopRightRadius: "80px",
           }}
         >
           <Text
-            style={{ marginBottom: "2rem", paddingHorizontal: "2rem" }}
+            style={{ marginBottom: "32px", paddingHorizontal: "32px" }}
             category="h2"
           >
             {med.name}
@@ -65,7 +65,7 @@ const MedButton = ({ index, med, onPress, handleArchive, handleDelete }) => {
             style={{
               backgroundColor: colorTheme["light-green"],
               borderColor: colorTheme["light-green"],
-              borderRadius: "1rem",
+              borderRadius: "16px",
             }}
             children={() => <Text category="h2">{actionWord} This Med</Text>}
           />
@@ -80,9 +80,9 @@ const MedButton = ({ index, med, onPress, handleArchive, handleDelete }) => {
           style={{
             backgroundColor: "white",
             justifyContent: "center",
-            padding: "2.5rem",
-            paddingTop: "3rem",
-            width: "calc(100vw - 30px)",
+            padding: "40px",
+            paddingTop: "48px",
+            width: "calc(100% - 30px)",
             position: "fixed",
             top: "40%",
             left: "15px",
@@ -91,7 +91,7 @@ const MedButton = ({ index, med, onPress, handleArchive, handleDelete }) => {
           }}
         >
           <Text
-            style={{ marginBottom: "18px", paddingHorizontal: "2rem" }}
+            style={{ marginBottom: "18px", paddingHorizontal: "32px" }}
             category="h2"
           >
             {actionWord} This Medication?
@@ -101,7 +101,7 @@ const MedButton = ({ index, med, onPress, handleArchive, handleDelete }) => {
           >
             {description}
           </Text>
-          <View style={{ display: "flex", flexDirection: "row", gap: "1rem" }}>
+          <View style={{ display: "flex", flexDirection: "row", gap: "16px" }}>
             <Button
               size="small"
               onPress={() => setShowArchiveModal(false)}
@@ -109,7 +109,7 @@ const MedButton = ({ index, med, onPress, handleArchive, handleDelete }) => {
                 flex: 1,
                 backgroundColor: colorTheme["white"],
                 borderColor: colorTheme["light-green"],
-                borderRadius: "1rem",
+                borderRadius: "16px",
               }}
               children={() => <Text category="h2">cancel</Text>}
             />
@@ -125,7 +125,7 @@ const MedButton = ({ index, med, onPress, handleArchive, handleDelete }) => {
                 flex: 1,
                 backgroundColor: colorTheme["light-green"],
                 borderColor: colorTheme["light-green"],
-                borderRadius: "1rem",
+                borderRadius: "16px",
               }}
               children={() => <Text category="h2">{actionWord}</Text>}
             />
@@ -231,9 +231,9 @@ export const MedFolder = ({ navigation }) => {
       >
         <View
           style={{
-            paddingHorizontal: "2.5rem",
-            marginTop: "2rem",
-            gap: "1rem",
+            paddingHorizontal: "40px",
+            marginTop: "32px",
+            gap: "16px",
           }}
         >
           {data.map((med, index) => (
@@ -456,9 +456,9 @@ export const InfoScreen = ({ navigation, route }) => {
               <View
                 style={{
                   backgroundColor: "#fff",
-                  padding: "2rem",
+                  padding: "32px",
                   borderRadius: 20,
-                  gap: "1rem",
+                  gap: "16px",
                 }}
               >
                 <View>
@@ -541,7 +541,7 @@ export const InfoScreen = ({ navigation, route }) => {
               style={{
                 backgroundColor: colorTheme["light-green"],
                 borderColor: colorTheme["light-green"],
-                borderRadius: "1rem",
+                borderRadius: "16px",
               }}
               children={() => <Text category="h2">Archive This Med</Text>}
             />
@@ -654,7 +654,7 @@ export const EditReminderScreen = ({ route, navigation }) => {
               <Button
                 onPress={() => navigation.navigate("Info")}
                 size="giant"
-                style={{ ...styles.orangerButton, borderRadius: "1rem" }}
+                style={{ ...styles.orangerButton, borderRadius: "16px" }}
                 children={() => <Text category="h2">Confirm</Text>}
               />
               <Button
@@ -662,7 +662,7 @@ export const EditReminderScreen = ({ route, navigation }) => {
                 style={{
                   backgroundColor: colorTheme["silver-white"],
                   borderColor: colorTheme["princeton-orange"],
-                  borderRadius: "1rem",
+                  borderRadius: "16px",
                 }}
                 children={() => <Text category="h2">Scan Med Again</Text>}
               />
@@ -776,7 +776,7 @@ export const EditInfoScreen = ({ navigation, route }) => {
             <Button
               onPress={() => navigation.navigate(InfoScreen)}
               size="giant"
-              style={{ ...styles.orangerButton, borderRadius: "1rem" }}
+              style={{ ...styles.orangerButton, borderRadius: "16px" }}
               children={() => <Text category="h2">Confirm</Text>}
             />
             <Button
@@ -784,7 +784,7 @@ export const EditInfoScreen = ({ navigation, route }) => {
               style={{
                 backgroundColor: colorTheme["silver-white"],
                 borderColor: colorTheme["princeton-orange"],
-                borderRadius: "1rem",
+                borderRadius: "16px",
               }}
               children={() => <Text category="h2">Scan Med Again</Text>}
             />
