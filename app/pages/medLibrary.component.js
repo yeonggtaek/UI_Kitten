@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { SafeAreaView, View, Image, ScrollView } from "react-native";
+import { MedLibNavigator } from "@/app/navigators/medLibNavigator.component";
 import {
   Button,
   Layout,
@@ -20,6 +21,65 @@ import { styles } from "@/app/stylesheet";
 
 import { LIBRARY_DATA } from "@/app/data/medData";
 import { HomeScreen } from "./home.component";
+
+const ArchiveModal = ({ open, close, actionWord, onPress, description }) => {
+  return (
+    <Modal
+      visible={open}
+      backdropStyle={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
+      onBackdropPress={() => close()}
+    >
+      <View
+        style={{
+          backgroundColor: "white",
+          justifyContent: "center",
+          padding: "40px",
+          paddingTop: "48px",
+          width: "calc(100% - 30px)",
+          position: "fixed",
+          top: "40%",
+          left: "15px",
+          right: "15px",
+          borderRadius: "20px",
+        }}
+      >
+        <Text
+          style={{ marginBottom: "18px", paddingHorizontal: "32px" }}
+          category="h2"
+        >
+          {actionWord} This Medication?
+        </Text>
+        <Text style={{ width: "270px", margin: "auto", marginBottom: "15px" }}>
+          {description}
+        </Text>
+        <View style={{ display: "flex", flexDirection: "row", gap: "16px" }}>
+          <Button
+            size="small"
+            onPress={() => close()}
+            style={{
+              flex: 1,
+              backgroundColor: colorTheme["white"],
+              borderColor: colorTheme["light-green"],
+              borderRadius: "16px",
+            }}
+            children={() => <Text category="h2">cancel</Text>}
+          />
+          <Button
+            size="small"
+            onPress={onPress}
+            style={{
+              flex: 1,
+              backgroundColor: colorTheme["light-green"],
+              borderColor: colorTheme["light-green"],
+              borderRadius: "16px",
+            }}
+            children={() => <Text category="h2">{actionWord}</Text>}
+          />
+        </View>
+      </View>
+    </Modal>
+  );
+};
 
 const MedButton = ({ index, med, onPress, handleArchive, handleDelete }) => {
   const [showArchiveBottomModal, setShowArchiveBottomModal] = useState(false);
@@ -71,67 +131,18 @@ const MedButton = ({ index, med, onPress, handleArchive, handleDelete }) => {
           />
         </View>
       </Modal>
-      <Modal
-        visible={showArchiveModal}
-        backdropStyle={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
-        onBackdropPress={() => setShowArchiveModal(false)}
-      >
-        <View
-          style={{
-            backgroundColor: "white",
-            justifyContent: "center",
-            padding: "40px",
-            paddingTop: "48px",
-            width: "calc(100% - 30px)",
-            position: "fixed",
-            top: "40%",
-            left: "15px",
-            right: "15px",
-            borderRadius: "20px",
-          }}
-        >
-          <Text
-            style={{ marginBottom: "18px", paddingHorizontal: "32px" }}
-            category="h2"
-          >
-            {actionWord} This Medication?
-          </Text>
-          <Text
-            style={{ width: "270px", margin: "auto", marginBottom: "15px" }}
-          >
-            {description}
-          </Text>
-          <View style={{ display: "flex", flexDirection: "row", gap: "16px" }}>
-            <Button
-              size="small"
-              onPress={() => setShowArchiveModal(false)}
-              style={{
-                flex: 1,
-                backgroundColor: colorTheme["white"],
-                borderColor: colorTheme["light-green"],
-                borderRadius: "16px",
-              }}
-              children={() => <Text category="h2">cancel</Text>}
-            />
-            <Button
-              size="small"
-              onPress={() => {
-                // archive logic
-                med.isArchive ? handleDelete(med) : handleArchive(med);
-                setShowArchiveModal(false);
-                setShowArchiveBottomModal(false);
-              }}
-              style={{
-                flex: 1,
-                backgroundColor: colorTheme["light-green"],
-                borderColor: colorTheme["light-green"],
-                borderRadius: "16px",
-              }}
-              children={() => <Text category="h2">{actionWord}</Text>}
-            />
-          </View>
-        </View>
-      </Modal>
+      <ArchiveModal
+        open={showArchiveModal}
+        close={() => setShowArchiveModal(false)}
+        actionWord={actionWord}
+        onPress={() => {
+          // archive logic
+          med.isArchive ? handleDelete(med) : handleArchive(med);
+          setShowArchiveModal(false);
+          setShowArchiveBottomModal(false);
+        }}
+        description={description}
+      />
       <Button
         onPress={onPress}
         style={{
@@ -223,6 +234,21 @@ export const MedFolder = ({ navigation }) => {
     );
   };
 
+  const handleDelete = (med) => {
+    setData((prev) => prev.filter((m) => m.name !== med.name));
+  };
+  const handleArchive = (med) => {
+    setData((prev) => {
+      const newData = prev.map((m) => {
+        if (m.name === med.name) {
+          m.isArchive = true;
+        }
+        return m;
+      });
+      return newData.filter((m) => !m.isArchive);
+    });
+  };
+
   return (
     <Layout style={{ flex: "1" }}>
       <TabSwitch />
@@ -241,21 +267,15 @@ export const MedFolder = ({ navigation }) => {
               key={med.name}
               med={med}
               index={index}
-              onPress={() => navigation.navigate("Info", { medication: med })}
-              handleArchive={(med) => {
-                setData((prev) => {
-                  const newData = prev.map((m) => {
-                    if (m.name === med.name) {
-                      m.isArchive = true;
-                    }
-                    return m;
-                  });
-                  return newData.filter((m) => !m.isArchive);
-                });
-              }}
-              handleDelete={(med) => {
-                setData((prev) => prev.filter((m) => m.name !== med.name));
-              }}
+              onPress={() =>
+                navigation.navigate("Info", {
+                  medication: med,
+                  handleDelete,
+                  handleArchive,
+                })
+              }
+              handleArchive={handleArchive}
+              handleDelete={handleDelete}
             />
           ))}
         </View>
@@ -265,97 +285,41 @@ export const MedFolder = ({ navigation }) => {
 };
 
 export const InfoScreen = ({ navigation, route }) => {
+  const [showArchiveModal, setShowArchiveModal] = useState(false);
   // info screen
   const medication = route.params.medication;
+  const handleDelete = route.params.handleDelete;
+  const handleArchive = route.params.handleArchive;
+  const actionWord = medication.isArchive ? "Delete" : "Archive";
+  const description = medication.isArchive
+    ? "Are you sure you want to delete this medication from the archive?"
+    : "This medication will be marked as inactive and stored in the archive for future reference.";
 
-  const handleArchive = () => {
+  const onPress = () => {
     // Handle archiving logic here
-    console.log(`${medication.name} archived`);
+    setShowArchiveModal(true);
   };
 
   return (
-    // <SafeAreaView style={{ flex: 1 }}>
-    //   <Header navigation={navigation} />
-    //   <ScrollView contentContainerStyle={{ padding: 16 }}>
-    //     <Layout style={styles.masterLayout}>
-
-    //       Reminder Section
-    //       <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
-    //         <Icon name="clock-outline" fill={colorTheme['persian-green']} style={{ width: 24, height: 24, marginRight: 8 }} />
-    //         <Text category="h1" style={{ color: colorTheme['persian-green'] }}>Reminder</Text>
-    //       </View>
-    //       <View style={{
-    //         backgroundColor: "#ffffff",
-    //         borderRadius: 10,
-    //         padding: 16,
-    //         marginBottom: 16,
-    //       }}>
-    //         {medication.reminder.map((item, index) => (
-    //           <Text key={index} category="p1" style={{ marginBottom: 4 }}>
-    //             {item}
-    //           </Text>
-    //         ))}
-    //       </View>
-
-    //       Medication Info Section
-    //       <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
-    //         <Icon name="file-text-outline" fill={colorTheme['persian-green']} style={{ width: 24, height: 24, marginRight: 8 }} />
-    //         <Text category="h1" style={{ color: colorTheme['persian-green'] }}>Medication Info</Text>
-    //       </View>
-    //       <View style={{
-    //         backgroundColor: "#ffffff",
-    //         borderRadius: 10,
-    //         padding: 16,
-    //         marginBottom: 16,
-    //       }}>
-    //         <Text category="h3" style={{ color: colorTheme['persian-green'], marginBottom: 8 }}>Description</Text>
-    //         <Text>{medication.description}</Text>
-
-    //         <Text category="h3" style={{ color: colorTheme['persian-green'], marginTop: 16, marginBottom: 8 }}>Side Effects</Text>
-    //         <View style={{ marginTop: 8 }}>
-    //           {medication.sideEffects.map((effect, index) => (
-    //             <Text key={index}>• {effect}</Text>
-    //           ))}
-    //         </View>
-
-    //         <Text category="h3" style={{ color: colorTheme['persian-green'], marginTop: 16, marginBottom: 8 }}>Directions for Use</Text>
-    //         <View style={{ marginTop: 8 }}>
-    //           {medication.directions.map((direction, index) => (
-    //             <Text key={index}>• {direction}</Text>
-    //           ))}
-    //         </View>
-
-    //         Medication Summary
-    //         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 24 }}>
-    //           <View>
-    //             <Text category="h5" style={{ color: colorTheme['persian-green'], marginBottom: 8 }}>
-    //               Drug Strength
-    //             </Text>
-    //             <Text category="h5" style={{ color: colorTheme['persian-green'], marginBottom: 8 }}>
-    //               Dosage Type
-    //             </Text>
-    //             <Text category="h5" style={{ color: colorTheme['persian-green'], marginBottom: 8 }}>
-    //               Quantity Prescribed
-    //             </Text>
-    //             <Text category="h5" style={{ color: colorTheme['persian-green'], marginBottom: 8 }}>
-    //               Number of Refills
-    //             </Text>
-    //           </View>
-    //           <View>
-    //             <Text style={{ marginBottom: 8 }}>{medication.strength}</Text>
-    //             <Text style={{ marginBottom: 8 }}>{medication.type}</Text>
-    //             <Text style={{ marginBottom: 8 }}>{medication.quantity}</Text>
-    //             <Text style={{ marginBottom: 8 }}>{medication.refills}</Text>
-    //           </View>
-    //         </View>
-    //       </View>
-
-    //       Archive Button
-    //     </Layout>
-    //   </ScrollView>
     <SafeAreaView style={{ flex: 1 }}>
       <Header navigation={navigation} />
       <Layout style={styles.masterLayout}>
+        <ArchiveModal
+          open={showArchiveModal}
+          close={() => setShowArchiveModal(false)}
+          actionWord={actionWord}
+          onPress={() => {
+            // archive logic
+            if (medication.isArchive) {
+              handleDelete(medication);
+            } else {
+              handleArchive(medication);
+              navigation.navigate(MedLibNavigator);
+            }
+            setShowArchiveModal(false);
+          }}
+          description={description}
+        />
         <ScrollView>
           <View
             style={{
@@ -537,13 +501,13 @@ export const InfoScreen = ({ navigation, route }) => {
             </View>
             <Button
               size="giant"
-              onPress={handleArchive}
+              onPress={onPress}
               style={{
                 backgroundColor: colorTheme["light-green"],
                 borderColor: colorTheme["light-green"],
                 borderRadius: "16px",
               }}
-              children={() => <Text category="h2">Archive This Med</Text>}
+              children={() => <Text category="h2">{actionWord} This Med</Text>}
             />
           </View>
         </ScrollView>
@@ -676,7 +640,7 @@ export const EditReminderScreen = ({ route, navigation }) => {
 
 export const EditInfoScreen = ({ navigation, route }) => {
   // edit info screen
-  // const medication = route.params.medication;//not working
+  // const med = route.params.medication; //not working
   // console.log(medication);
   const [directions, setDirections] = useState("");
   // function handleEditDirections(e) {
@@ -774,7 +738,7 @@ export const EditInfoScreen = ({ navigation, route }) => {
           </View>
           <View style={{ gap: 6 }}>
             <Button
-              onPress={() => navigation.navigate(InfoScreen)}
+              // onPress={() => navigation.navigate("Info", { medication: med })}
               size="giant"
               style={{ ...styles.orangerButton, borderRadius: "16px" }}
               children={() => <Text category="h2">Confirm</Text>}
