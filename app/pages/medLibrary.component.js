@@ -84,8 +84,7 @@ const MedButton = ({ index, med, onPress, handleArchive, handleDelete }) => {
             paddingTop: "3rem",
             width: "calc(100vw - 30px)",
             position: "fixed",
-            top: "50%",
-            transform: "translateY(-50%)",
+            top: "40%",
             left: "15px",
             right: "15px",
             borderRadius: "20px",
@@ -582,56 +581,93 @@ export const EditReminderScreen = ({ route, navigation }) => {
           <View style={{ gap: 20, margin: 20 }}>
             <View>
               <Text category="p2">Time</Text>
-              <View style={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row', backgroundColor: "white", width: '90%', borderRadius: 20 }}>
-          <Input style={{ flex: 6}} placeholder='10: 30pm'/>
+              <View
+                style={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                  flexDirection: "row",
+                  backgroundColor: "white",
+                  width: "90%",
+                  borderRadius: 20,
+                }}
+              >
+                <Input style={{ flex: 6 }} placeholder="10: 30pm" />
               </View>
             </View>
             <View>
               <Text category="p2">Time Interval</Text>
-              <View style={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row', backgroundColor: "sliver-white", width: '90%', borderRadius: 20 }}>
-          <Input style={{ flex: 6}} placeholder='Every 2 hours'/>
-          <Button style={{ flex: 3 }} onPress={() => navigation.navigate("TimeIntervaledit")}>Edit</Button>
-        </View>
+              <View
+                style={{
+                  justifyContent: "center",
+                  alignItems: "center",
+                  flexDirection: "row",
+                  backgroundColor: "sliver-white",
+                  width: "90%",
+                  borderRadius: 20,
+                }}
+              >
+                <Input style={{ flex: 6 }} placeholder="Every 2 hours" />
+                <Button
+                  style={{ flex: 3 }}
+                  onPress={() => navigation.navigate("TimeIntervaledit")}
+                >
+                  Edit
+                </Button>
+              </View>
             </View>
             <View>
               <Text category="p2">Treatment Start Date</Text>
             </View>
             <Datepicker
-        date={date}
-        onSelect={nextDate => setDate(nextDate)}
-      />
+              date={date}
+              onSelect={(nextDate) => setDate(nextDate)}
+            />
             <View>
               <Text category="p2">Treatment End Date</Text>
             </View>
             <Datepicker
-        date={date}
-        onSelect={nextDate => setDate(nextDate)}
-      />
+              date={date}
+              onSelect={(nextDate) => setDate(nextDate)}
+            />
             <View>
               <Text category="p2">Refill Reminder</Text>
             </View>
-            <View style={{ justifyContent: 'center', alignItems: 'center', flexDirection: 'row', backgroundColor: "sliver-white", width: '90%', borderRadius: 20 }}>
-          <Input style={{ flex: 6}} placeholder='10 pill(s) left'/>
-          <Button style={{ flex: 3 }} onPress={() => navigation.navigate("Current Pill Number")}>Edit</Button>
-          </View>
-          <View style={{ gap: 6 }}>
-            <Button
-              onPress={() => navigation.navigate("Info")}
-              size="giant"
-              style={{ ...styles.orangerButton, borderRadius: "1rem" }}
-              children={() => <Text category="h2">Confirm</Text>}
-            />
-            <Button
-              size="giant"
+            <View
               style={{
-                backgroundColor: colorTheme["silver-white"],
-                borderColor: colorTheme["princeton-orange"],
-                borderRadius: "1rem",
+                justifyContent: "center",
+                alignItems: "center",
+                flexDirection: "row",
+                backgroundColor: "sliver-white",
+                width: "90%",
+                borderRadius: 20,
               }}
-              children={() => <Text category="h2">Scan Med Again</Text>}
-            />
+            >
+              <Input style={{ flex: 6 }} placeholder="10 pill(s) left" />
+              <Button
+                style={{ flex: 3 }}
+                onPress={() => navigation.navigate("Current Pill Number")}
+              >
+                Edit
+              </Button>
+            </View>
+            <View style={{ gap: 6 }}>
+              <Button
+                onPress={() => navigation.navigate("Info")}
+                size="giant"
+                style={{ ...styles.orangerButton, borderRadius: "1rem" }}
+                children={() => <Text category="h2">Confirm</Text>}
+              />
+              <Button
+                size="giant"
+                style={{
+                  backgroundColor: colorTheme["silver-white"],
+                  borderColor: colorTheme["princeton-orange"],
+                  borderRadius: "1rem",
+                }}
+                children={() => <Text category="h2">Scan Med Again</Text>}
+              />
+            </View>
           </View>
-        </View>
         </View>
       </Layout>
     </SafeAreaView>
